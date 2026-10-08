@@ -307,25 +307,47 @@ export function nearbyPlaces(elements, origin, radius) {
         e.geometry
           .filter((g) => Number.isFinite(g.lat) && Number.isFinite(g.lon))
           .sort((a, b) => distance(origin, a) - distance(origin, b))[0] || p;
-    if (!p || !Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
+    if (
+      !p ||
+      !Number.isFinite(p.lat) ||
+      !Number.isFinite(p.lon) ||
+      Math.abs(p.lat) > 90 ||
+      Math.abs(p.lon) > 180
+    )
+      continue;
     const meters = distance(origin, p);
     if (meters > radius) continue;
+    const isWikidata =
+      e.type === "wikidata" && /^Q[1-9]\d*$/.test(String(e.id));
+    if (
+      !isWikidata &&
+      (!["node", "way", "relation"].includes(e.type) ||
+        !Number.isSafeInteger(e.id) ||
+        e.id < 1)
+    )
+      continue;
     const id = `${e.type}/${e.id}`;
-    if (seen.has(id)) continue;
-    seen.add(id);
+    const cooldownId = /^Q[1-9]\d*$/.test(t.wikidata || "")
+      ? `wikidata/${t.wikidata}`
+      : id;
+    if (seen.has(cooldownId)) continue;
+    seen.add(cooldownId);
     const name = cleanText(
       t.name || t["name:en"] || `Nearby ${kind.replaceAll("_", " ")}`,
       70,
     );
     result.push({
       id,
+      cooldownId,
       name,
       kind,
       lat: p.lat,
       lon: p.lon,
       meters: Math.round(meters),
       access: t.access || "not specified",
-      source: `https://www.openstreetmap.org/${id}`,
+      source: isWikidata
+        ? `https://www.wikidata.org/wiki/${e.id}`
+        : `https://www.openstreetmap.org/${id}`,
       mapped: true,
     });
   }
@@ -409,6 +431,7 @@ export function buildQuest({
   const brief = generated || curated[type];
   const checkpoints = chosen.map((p, i) => ({
     id: p.id,
+    cooldownId: p.cooldownId || p.id,
     name: p.name,
     lat: p.lat,
     lon: p.lon,

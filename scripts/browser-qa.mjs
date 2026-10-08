@@ -18,11 +18,14 @@ const check = (name, detail) => {
 let browser, server, store, page;
 const places = DEMO_PLACES.map((p, i) => ({
   ...p,
-  id: `node/${900000001 + i}`,
+  id: i === 0 ? "wikidata/Q123" : `node/${900000001 + i}`,
   name: ["QA Garden", "QA Sculpture", "QA Grove"][i],
   access: "yes",
   mapped: true,
-  source: `https://www.openstreetmap.org/node/${900000001 + i}`,
+  source:
+    i === 0
+      ? "https://www.wikidata.org/wiki/Q123"
+      : `https://www.openstreetmap.org/node/${900000001 + i}`,
 }));
 try {
   await mkdir("docs", { recursive: true });
@@ -157,12 +160,23 @@ try {
     .getByRole("button", { name: "Use my location", exact: true })
     .click();
   await page.getByText("QA Garden", { exact: true }).first().waitFor();
-  check("Real-mode GPS permission flow and grounded map fixture");
   await page.locator(".quest-card.gate .quest-enter").click();
   await page
     .getByRole("button", { name: "Use a curated briefing", exact: true })
     .click();
   await page.locator(".active-quest").waitFor();
+  const sourceLink = page.getByRole("link", {
+    name: "Wikidata source",
+    exact: true,
+  });
+  await sourceLink.waitFor();
+  assert.equal(
+    await sourceLink.getAttribute("href"),
+    "https://www.wikidata.org/wiki/Q123",
+  );
+  check(
+    "Real-mode GPS permission flow, grounded fixture, and Wikidata attribution",
+  );
   await page.evaluate(() => {
     window.qaNativeRecognition = {
       standard: window.SpeechRecognition,

@@ -85,3 +85,55 @@ test("Primary outage switches to a public fallback with the same coarse search",
   assert.ok(requests[0].query.includes("51.507,-0.128"));
   assert.ok(!requests[0].query.includes("51.5072"));
 });
+
+const wikidataFixture = {
+  results: {
+    bindings: [
+      {
+        place: { value: "http://www.wikidata.org/entity/Q123" },
+        placeLabel: { value: "Fixture Monument" },
+        coord: { value: "Point(-0.1276 51.5072)" },
+        kind: { value: "artwork" },
+      },
+    ],
+  },
+};
+test("Independent Wikidata fallback returns attributed real destinations and caches them", async () => {
+  const requests = [];
+  const discover = createPlaceDiscovery({
+    fetchImpl: async (url, options) => {
+      requests.push({ url, options });
+      return url.includes("query.wikidata.org")
+        ? new Response(JSON.stringify(wikidataFixture))
+        : new Response("", { status: 503 });
+    },
+  });
+  const result = await discover(origin, 700);
+  assert.equal(result.places[0].id, "wikidata/Q123");
+  assert.equal(result.places[0].source, "https://www.wikidata.org/wiki/Q123");
+  assert.equal(result.places[0].access, "not specified");
+  assert.equal(requests.length, 3);
+  const query = new URL(requests[2].url).searchParams.get("query");
+  assert.ok(query.includes("Point(-0.128 51.507)"));
+  assert.ok(!query.includes("51.5072"));
+  assert.equal(
+    requests[2].options.headers.Accept,
+    "application/sparql-results+json",
+  );
+  assert.equal((await discover(origin, 700)).cached, true);
+  assert.equal(requests.length, 3);
+});
+test("A valid empty map remains distinct from an upstream outage", async () => {
+  const discover = createPlaceDiscovery({
+    fetchImpl: async (url) =>
+      new Response(
+        JSON.stringify(
+          url.includes("wikidata")
+            ? { results: { bindings: [] } }
+            : { elements: [] },
+        ),
+      ),
+  });
+  assert.deepEqual((await discover(origin, 700)).places, []);
+  assert.equal((await discover(origin, 700)).cached, true);
+});

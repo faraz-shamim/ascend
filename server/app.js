@@ -17,6 +17,8 @@ import {
   utcDay,
 } from "../web/lib/domain.js";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
+const placeHashes = (place) =>
+  [...new Set([place.id, place.cooldownId || place.id])].map(hash);
 export function publicPlayer(p) {
   return {
     id: p.id,
@@ -153,7 +155,9 @@ export async function createApp(options = {}) {
       );
       res.json({
         ...result,
-        places: result.places.filter((p) => !used.has(hash(p.id))),
+        places: result.places.filter((p) =>
+          placeHashes(p).every((id) => !used.has(id)),
+        ),
       });
     } catch (e) {
       next(e);
@@ -171,7 +175,9 @@ export async function createApp(options = {}) {
       );
       res.json({
         ...result,
-        places: result.places.filter((p) => !used.has(hash(p.id))),
+        places: result.places.filter((p) =>
+          placeHashes(p).every((id) => !used.has(id)),
+        ),
       });
     } catch (e) {
       next(e);
@@ -213,7 +219,9 @@ export async function createApp(options = {}) {
           );
         if (
           recent.some((x) =>
-            quest.checkpoints.some((c) => x.places.includes(hash(c.id))),
+            quest.checkpoints.some((c) =>
+              placeHashes(c).some((id) => x.places.includes(id)),
+            ),
           )
         )
           fail(
@@ -296,7 +304,7 @@ export async function createApp(options = {}) {
           id: q.id,
           at: now(),
           type: q.type,
-          places: q.checkpoints.map((c) => hash(c.id)),
+          places: [...new Set(q.checkpoints.flatMap(placeHashes))],
         });
         p.completed = p.completed.slice(-500);
         p.activeQuest = null;

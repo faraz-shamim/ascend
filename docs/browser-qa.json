@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-10-08T10:26:57.324Z",
+  "startedAt": "2026-10-08T11:25:17.796Z",
   "environment": "Fresh automated Chromium; simulated GPS and synthetic camera feed; no outdoor visit claimed",
   "checks": [
     {
@@ -35,7 +35,7 @@
       "passed": true
     },
     {
-      "name": "Real-mode GPS permission flow and grounded map fixture",
+      "name": "Real-mode GPS permission flow, grounded fixture, and Wikidata attribution",
       "passed": true
     },
     {
@@ -71,7 +71,20 @@
       "passed": true,
       "detail": {
         "speechSynthesis": true,
-        "localVoices": [],
+        "localVoices": [
+          {
+            "name": "Microsoft David - English (United States)",
+            "lang": "en-US"
+          },
+          {
+            "name": "Microsoft Mark - English (United States)",
+            "lang": "en-US"
+          },
+          {
+            "name": "Microsoft Zira - English (United States)",
+            "lang": "en-US"
+          }
+        ],
         "speechRecognition": true
       }
     },
@@ -92,9 +105,22 @@
   },
   "voice": {
     "speechSynthesis": true,
-    "localVoices": [],
+    "localVoices": [
+      {
+        "name": "Microsoft David - English (United States)",
+        "lang": "en-US"
+      },
+      {
+        "name": "Microsoft Mark - English (United States)",
+        "lang": "en-US"
+      },
+      {
+        "name": "Microsoft Zira - English (United States)",
+        "lang": "en-US"
+      }
+    ],
     "speechRecognition": true
   },
-  "finishedAt": "2026-10-08T10:27:28.821Z",
+  "finishedAt": "2026-10-08T11:25:49.507Z",
   "passed": true
 }

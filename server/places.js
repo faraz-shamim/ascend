@@ -1,8 +1,9 @@
 import { coordinates, nearbyPlaces, fail } from "../web/lib/domain.js";
+import { wikidataQuery, wikidataElements } from "./wikidata.js";
 
 const BUSY =
   "The public map service is busy. Your progress is safe. Try again shortly, or explore the rehearsal.";
-// Separate clients make tests isolated; the production client shares caches and upstream limits.
+// Separate clients make tests isolated; production shares caches and upstream limits.
 export function createPlaceDiscovery({
   fetchImpl = fetch,
   now = Date.now,
@@ -22,6 +23,15 @@ export function createPlaceDiscovery({
       dailyLimit: 500,
       byteLimit: 25_000_000,
     },
+    // This independent open-data source also works when the Overpass gateways are unavailable.
+    {
+      url: "https://query.wikidata.org/sparql",
+      method: "GET",
+      kind: "wikidata",
+      minimumInterval: 30000,
+      dailyLimit: 100,
+      byteLimit: 10_000_000,
+    },
     {
       url: "https://overpass-api.de/api/interpreter",
       method: "POST",
@@ -38,6 +48,7 @@ export function createPlaceDiscovery({
   let queue = Promise.resolve();
   async function lookup(origin, radius, key) {
     const query = `[out:json][timeout:18][maxsize:67108864];(nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[leisure~"^(park|garden|recreation_ground)$"];nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[tourism~"^(artwork|viewpoint)$"];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[natural=tree][name];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[amenity=fountain];);out tags center geom;`;
+    let emptyResult = null;
     for (const upstream of upstreams) {
       const day = new Date(now()).toISOString().slice(0, 10);
       if (upstream.day !== day)
@@ -49,8 +60,14 @@ export function createPlaceDiscovery({
       )
         continue;
       upstream.requests++;
+      if (upstream.minimumInterval)
+        upstream.blockedUntil = now() + upstream.minimumInterval;
       try {
-        const params = new URLSearchParams({ data: query });
+        const params = new URLSearchParams(
+          upstream.kind === "wikidata"
+            ? { query: wikidataQuery(origin, radius), format: "json" }
+            : { data: query },
+        );
         const url =
           upstream.method === "GET"
             ? upstream.url + "?" + params
@@ -62,8 +79,14 @@ export function createPlaceDiscovery({
             "User-Agent":
               "ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)",
             "Content-Type": "application/x-www-form-urlencoded",
+            Accept:
+              upstream.kind === "wikidata"
+                ? "application/sparql-results+json"
+                : "application/json",
           },
-          signal: AbortSignal.timeout(35000),
+          signal: AbortSignal.timeout(
+            upstream.kind === "wikidata" ? 25000 : 35000,
+          ),
         });
         if (!response.ok) {
           const rejection = await response.text().catch(() => "");
@@ -84,26 +107,35 @@ export function createPlaceDiscovery({
             }),
           );
           const retry = Number(response.headers?.get("retry-after"));
-          upstream.blockedUntil =
+          upstream.blockedUntil = Math.max(
+            upstream.blockedUntil,
             now() +
-            Math.max(
-              response.status === 429 ||
-                response.status === 406 ||
-                response.status >= 500
-                ? 30_000
-                : 10_000,
-              Number.isFinite(retry) ? Math.min(retry * 1000, 86_400_000) : 0,
-            );
+              Math.max(
+                response.status === 429 ||
+                  response.status === 406 ||
+                  response.status >= 500
+                  ? 30000
+                  : 10000,
+                Number.isFinite(retry) ? Math.min(retry * 1000, 86400000) : 0,
+              ),
+          );
           continue;
         }
         const raw = await response.text();
         upstream.bytes += Buffer.byteLength(raw);
         if (upstream.bytes > upstream.byteLimit) continue;
         const data = JSON.parse(raw);
-        if (!Array.isArray(data.elements)) continue;
-        if (cache.size >= 128) cache.delete(cache.keys().next().value);
-        cache.set(key, { at: now(), elements: data.elements });
-        return data.elements;
+        const elements =
+          upstream.kind === "wikidata"
+            ? wikidataElements(data, now())
+            : data.elements;
+        if (!Array.isArray(elements)) continue;
+        // An empty valid map is different from an outage; another source may have coverage.
+        if (!nearbyPlaces(elements, origin, radius).length) {
+          emptyResult = elements;
+          continue;
+        }
+        return remember(key, elements);
       } catch (error) {
         console.warn(
           "ASCEND map upstream",
@@ -113,16 +145,22 @@ export function createPlaceDiscovery({
             code: error.cause?.code,
           }),
         );
-        upstream.blockedUntil = now() + 10_000;
+        upstream.blockedUntil = Math.max(upstream.blockedUntil, now() + 10000);
       }
     }
+    if (emptyResult) return remember(key, emptyResult);
     fail(BUSY, 503);
+  }
+  function remember(key, elements) {
+    if (cache.size >= 128) cache.delete(cache.keys().next().value);
+    cache.set(key, { at: now(), elements });
+    return elements;
   }
   return async function discoverPlaces(origin, radius = 800) {
     coordinates(origin);
     if (!Number.isFinite(radius) || radius < 200 || radius > 2500)
       fail("Search radius must be between 200 and 2,500 metres.");
-    // Round the upstream center to ~100 m and pad its query; filter against the actual origin.
+    // Round the upstream center to ~100 m and pad it; filter against the actual origin.
     const key = `${origin.lat.toFixed(3)},${origin.lon.toFixed(3)},${Math.ceil(radius)}`;
     const cached = cache.get(key);
     if (cached && now() - cached.at < 15 * 60 * 1000)

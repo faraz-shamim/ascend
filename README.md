@@ -6,12 +6,12 @@ A location-based outdoor adventure game built for Hacktoberfest Week 1, October 
 
 ## Play
 
-[Open the playable preview](https://ascend-quests.onrender.com). Persistent Postgres is provisioned and awaiting its connection configuration; the preview currently uses temporary server storage. Run the complete app locally with the commands below. The permission-free rehearsal uses labelled fictional places and simulated check-ins; its rewards never enter world rankings.
+[Play ASCEND](https://ascend-quests.onrender.com). Explorer state and world rankings use persistent Render Postgres. Run the complete app locally with the commands below. The permission-free rehearsal uses labelled fictional places and simulated check-ins; its rewards never enter world rankings.
 
 ## Features
 
 - Three quest types: one-place gates, camera discoveries, and three-checkpoint trails.
-- Live nearby-place lookup through OpenStreetMap Overpass, with private/indoor access filtering and visible map attribution.
+- Live nearby-place lookup through OpenStreetMap Overpass, plus an independent Wikidata fallback for urban parks, monuments, and fountains. Known private/indoor access tags are filtered and every destination retains its source link.
 - Gemma 3 270M ONNX in a worker, WebGPU where available and a CPU-compatible WASM revision otherwise. First use downloads hundreds of MB; prompts and inference stay on the device.
 - Concise generated stories with a separate, deterministic location and reward engine. Camera discovery focuses come from a bounded set of observation categories.
 - GPS check-ins within 80 m, accuracy at most 65 m, and fixes at most 30 seconds old. Browser coordinates can be spoofed; this supports friendly play, not strong anti-cheat.
@@ -62,7 +62,7 @@ node scripts/gemma-qa.mjs
 
 The browser QA script currently uses an installed Windows Chrome path. Set `ASCEND_BROWSER_PATH` to another installed Chromium executable when running elsewhere. The unit/API/Postgres tests and production build run in GitHub Actions on Linux.
 
-- 29 automated checks cover coordinate validation, camera metadata, grounded destinations, XP/progression, auth/privacy, concurrent duplicate claims, cooldowns, weekly scores, quest expiry, Postgres rollback, and cleanup.
+- 33 automated checks cover coordinate validation, camera metadata, grounded destinations, XP/progression, auth/privacy, concurrent duplicate claims, cooldowns, weekly scores, quest expiry, Postgres rollback, and cleanup.
 - 19 browser QA scenarios exercise the main UI and server flows with **simulated GPS and a synthetic camera feed**, including responsive screens and journal privacy. It is not evidence of an outdoor visit.
 - Genuine local Gemma inference is recorded in [docs/gemma-inference.json](docs/gemma-inference.json). The compact model produced a story in about 5.1 seconds on the test browser's GPU; the first download and generation took about 98.5 seconds. This is one device measurement, not a universal performance guarantee.
 - CPU/WASM inference was also run with WebGPU disabled: about 33.1 seconds to generate, 170.4 seconds including the first download. See [docs/gemma-cpu-inference.json](docs/gemma-cpu-inference.json). Interrupted model downloads recover through verified 8 MiB ranges with bounded retries.
@@ -71,7 +71,7 @@ The browser QA script currently uses an installed Windows Chrome path. Set `ASCE
 
 ## Privacy and limits
 
-Location is requested when the explorer asks for nearby quests. Coordinates are used by ASCEND for the public map lookup and check-in validation. Public Overpass providers (Private.coffee, with VK Maps and FOSSGIS Overpass as fallbacks) receive a search area rounded to approximately 100 m. OpenStreetMap receives tiles for the displayed area. Searches are cached for 15 minutes, duplicate requests are coalesced, and upstream calls are serialized and capped. No continuous movement trail is saved.
+Location is requested when the explorer asks for nearby quests. Coordinates are used by ASCEND for the public map lookup and check-in validation. Public map providers (Private.coffee, VK Maps, FOSSGIS Overpass, and Wikidata) receive a search area rounded to approximately 100 m. OpenStreetMap receives tiles for the displayed area. Searches are cached for 15 minutes, duplicate requests are coalesced, and upstream calls are serialized and capped. Wikidata searches are limited to 100 per day and spaced at least 30 seconds apart. Its conservative fallback excludes broad residential-garden/amusement-park classes and known indoor, dissolved, or future places; missing access information still needs checking. No continuous movement trail is saved.
 
 The server temporarily holds active-quest destinations. Expired destinations are cleared by a periodic cleanup, within 15 minutes after the four-hour quest expiry. Completed records contain hashes of place IDs and completion metadata for cooldowns. Public rankings expose only aliases and aggregate game statistics.
 
@@ -83,7 +83,7 @@ Web geolocation updates pause when the document is hidden or locked. ASCEND resu
 
 ## Open pieces and provenance
 
-Code is MIT. Gemma weights are not bundled and retain [Gemma's terms](https://ai.google.dev/gemma/terms). Runtime: [Transformers.js](https://huggingface.co/docs/transformers.js/), ONNX Runtime, Express, Leaflet, and Postgres/SQLite. Map data is © OpenStreetMap contributors, ODbL. Original generated artwork, final prompts, and asset attribution are in [docs/artwork.md](docs/artwork.md).
+Code is MIT. Gemma weights are not bundled and retain [Gemma's terms](https://ai.google.dev/gemma/terms). Runtime: [Transformers.js](https://huggingface.co/docs/transformers.js/), ONNX Runtime, Express, Leaflet, and Postgres/SQLite. Map data is © OpenStreetMap contributors, ODbL. Structured Wikidata destinations are [CC0](https://www.wikidata.org/wiki/Wikidata:Data_access), with individual item links shown in the app. Original generated artwork, final prompts, and asset attribution are in [docs/artwork.md](docs/artwork.md).
 
 The concept borrows the feeling of anime progression and location-based collecting; all names, characters, art, and implementation are original. No Solo Leveling or Pokemon game assets are used. This new repository was begun during the Week 1 challenge window. Any commits after the October 11, 2026 submission deadline will be noted here.
 

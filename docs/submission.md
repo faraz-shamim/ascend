@@ -16,7 +16,7 @@ That is the idea behind **ASCEND**. The next level is somewhere outside your fro
 
 ASCEND is a browser-based outdoor quest game. It combines the anticipation of anime progression with the joy of finding things in the real world. You start at E-rank, finish small adventures, collect original companions, unlock trophies, and gradually work toward S-rank.
 
-The game begins with your location and the time you have. It finds nearby parks, gardens, outdoor artwork, viewpoints, and other eligible places in OpenStreetMap. **Gemma runs on your device** and writes a short fantasy atmosphere for the mapped destination. The story also helps choose a bounded observation prompt for a discovery quest.
+The game begins with your location and the time you have. It finds nearby parks, gardens, outdoor artwork, viewpoints, and other eligible places in OpenStreetMap, with a separate Wikidata fallback for urban parks, monuments, and fountains. **Gemma runs on your device** and writes a short fantasy atmosphere for the mapped destination. The story also helps choose a bounded observation prompt for a discovery quest.
 
 There are three ways to explore:
 
@@ -60,7 +60,9 @@ The code is MIT-licensed. The generated art has its own attribution instructions
 
 ### A story layer grounded in an actual map
 
-The map service uses Overpass to find eligible nearby places. Private.coffee is the primary provider; VK Maps and FOSSGIS supply bounded fallbacks when it is unavailable. Searches are cached and shared across concurrent explorers. Known private and indoor locations are filtered out. Access tags and OpenStreetMap source links remain visible because a mapped place is not proof that it is open or reachable by a pedestrian route.
+The map service uses OpenStreetMap Overpass, with bounded provider fallbacks. A real deployment test exposed unavailable Overpass gateways, so I added an independent Wikidata lookup for urban parks, monuments, and fountains. Its bounded query searches the local area before following category relationships, then checks known indoor, dissolved, and future locations. Broad residential-garden and amusement-park categories are excluded.
+
+Searches are cached and shared across concurrent explorers. Known private and indoor OpenStreetMap tags are filtered out. Access information and the original OpenStreetMap or Wikidata item remain visible because a mapped place is not proof that it is open or reachable by a pedestrian route.
 
 Gemma writes the story; a separate quest engine pins the destinations, objectives, and XP. The model cannot invent a destination or grant rewards. Long, code-like, or unsuitable narratives fall back to a clearly labelled curated briefing.
 
@@ -96,7 +98,7 @@ Render’s free service can take about a minute to wake, and its free Postgres e
 
 ### What I actually verified
 
-- **29 automated tests** cover auth, GPS validation, camera metadata, progression, cooldowns, duplicate rewards, map caching and backoff, and Postgres rollback and cleanup.
+- **33 automated tests** cover auth, GPS validation, camera metadata, progression, cooldowns, duplicate rewards, map caching and backoff, and Postgres rollback and cleanup.
 - **19 browser scenarios** cover the quest flows, camera capture, companions, trophies, rankings, session export/restore, journal deletion, and every screen at 390 px width.
 - A separate check returned **18 real mapped landmarks** near a public central London test coordinate.
 - Gemma’s inference ran for real in the browser; its measured output is linked above.
@@ -107,7 +109,7 @@ The browser suite uses **simulated GPS and a synthetic camera feed**. Voice-comm
 
 A location-aware game can easily become another stream of private information sent to a remote model. Open weights let ASCEND generate its story on the explorer’s device. The prompt does not need a hosted AI endpoint, a per-story charge, or an AI API key.
 
-OpenStreetMap supplies inspectable destinations. Transformers.js and ONNX Runtime make browser inference practical. The quest engine is readable, so someone can change reward rules, add companions, swap a model, or host their own version.
+OpenStreetMap and Wikidata supply inspectable destinations. Transformers.js and ONNX Runtime make browser inference practical. The quest engine is readable, so someone can change reward rules, add companions, swap a model, or host their own version.
 
 Local inference does not make the whole app offline: new map lookups and shared rankings still need a connection. It does let the creative part run locally after the model is downloaded, on a capable device. That is a useful boundary for a game built around stepping outside.
 

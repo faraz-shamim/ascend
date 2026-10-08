@@ -301,3 +301,84 @@ test("Abandoning quests and invalid profile data", async () => {
   );
   assert.equal((await request("/api/me", { alias: "x" }, "PATCH")).status, 400);
 });
+
+test("Source changes cannot award a second reward for the same linked place", async () => {
+  const localStore = await createStore({ path: ":memory:", uri: "" });
+  let destinations = [
+    {
+      ...DEMO_PLACES[0],
+      id: "node/111",
+      cooldownId: "wikidata/Q123",
+      source: "https://www.openstreetmap.org/node/111",
+    },
+  ];
+  const { app } = await createApp({
+    store: localStore,
+    now: () => clock,
+    discover: async () => ({ places: destinations, cached: false }),
+  });
+  const localServer = app.listen(0, "127.0.0.1");
+  await new Promise((r) => localServer.once("listening", r));
+  const url = `http://127.0.0.1:${localServer.address().port}`;
+  let session;
+  const call = async (path, body) => {
+    const r = await fetch(url + path, {
+      method: body ? "POST" : "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(session ? { Authorization: `Bearer ${session}` } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    return { status: r.status, body: await r.json() };
+  };
+  try {
+    session = (await call("/api/players", { alias: "Source QA" })).body.token;
+    const q = (
+      await call("/api/quests", {
+        origin: DEMO_ORIGIN,
+        type: "gate",
+        theme: "verdant",
+        minutes: 20,
+        placeIds: ["node/111"],
+      })
+    ).body.quest;
+    assert.equal(
+      (
+        await call(`/api/quests/${q.id}/check-in`, {
+          index: 0,
+          fix: fix(q.checkpoints[0]),
+        })
+      ).body.completed,
+      true,
+    );
+    destinations = [
+      {
+        ...destinations[0],
+        id: "wikidata/Q123",
+        source: "https://www.wikidata.org/wiki/Q123",
+      },
+    ];
+    assert.deepEqual(
+      (await call("/api/places", { origin: DEMO_ORIGIN, radius: 700 })).body
+        .places,
+      [],
+    );
+    assert.equal(
+      (
+        await call("/api/quests", {
+          origin: DEMO_ORIGIN,
+          type: "gate",
+          theme: "verdant",
+          minutes: 20,
+          placeIds: ["wikidata/Q123"],
+        })
+      ).status,
+      409,
+    );
+    assert.equal((await call("/api/me")).body.player.stats.xp, 100);
+  } finally {
+    await new Promise((r) => localServer.close(r));
+    await localStore.close();
+  }
+});
