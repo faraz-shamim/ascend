@@ -136,6 +136,7 @@ export const THEMES = { verdant: "Verdant", astral: "Astral", ember: "Ember" };
 export function fail(message, status = 400) {
   const e = new Error(message);
   e.status = status;
+  e.expose = true;
   throw e;
 }
 export function coordinates(p) {
