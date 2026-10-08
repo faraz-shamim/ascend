@@ -1,0 +1,121 @@
+{
+  "startedAt": "2026-10-08T09:18:16.703Z",
+  "environment": "Fresh automated Chromium; simulated GPS and synthetic camera feed; no outdoor visit claimed",
+  "checks": [
+    {
+      "name": "Desktop board renders without console exceptions",
+      "passed": true
+    },
+    {
+      "name": "Rehearsal gate, pocket guide, XP, companion and trophy unlock",
+      "passed": true
+    },
+    {
+      "name": "Rehearsal photo discovery and private journal",
+      "passed": true
+    },
+    {
+      "name": "Three-checkpoint rehearsal and D-rank progression",
+      "passed": true
+    },
+    {
+      "name": "Companion collection and equip",
+      "passed": true
+    },
+    {
+      "name": "Achievement hall and rank path",
+      "passed": true
+    },
+    {
+      "name": "Private journal contains all quest memories",
+      "passed": true
+    },
+    {
+      "name": "Rehearsal excluded from public leaderboard",
+      "passed": true
+    },
+    {
+      "name": "Real-mode GPS permission flow and grounded map fixture",
+      "passed": true
+    },
+    {
+      "name": "Voice command action and pause/resume using a synthesized transcript; no live audio",
+      "passed": true
+    },
+    {
+      "name": "Real API gate reward using simulated GPS",
+      "passed": true
+    },
+    {
+      "name": "Camera permission, capture, hash, observation and real API discovery reward",
+      "passed": true
+    },
+    {
+      "name": "Opt-in alias, all-time and weekly server rankings",
+      "passed": true
+    },
+    {
+      "name": "Explorer session survives reload",
+      "passed": true
+    },
+    {
+      "name": "Private explorer session export and restore",
+      "passed": true
+    },
+    {
+      "name": "390 × 844 responsive layout: every screen, no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Voice capability detection and supported playback/fallback path",
+      "passed": true,
+      "detail": {
+        "speechSynthesis": true,
+        "localVoices": [
+          {
+            "name": "Microsoft David - English (United States)",
+            "lang": "en-US"
+          },
+          {
+            "name": "Microsoft Mark - English (United States)",
+            "lang": "en-US"
+          },
+          {
+            "name": "Microsoft Zira - English (United States)",
+            "lang": "en-US"
+          }
+        ],
+        "speechRecognition": true
+      }
+    },
+    {
+      "name": "Local journal deletion preserves game rewards",
+      "passed": true
+    },
+    {
+      "name": "Denied geolocation returns a clear fallback with playable rehearsal",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "voice": {
+    "speechSynthesis": true,
+    "localVoices": [
+      {
+        "name": "Microsoft David - English (United States)",
+        "lang": "en-US"
+      },
+      {
+        "name": "Microsoft Mark - English (United States)",
+        "lang": "en-US"
+      },
+      {
+        "name": "Microsoft Zira - English (United States)",
+        "lang": "en-US"
+      }
+    ],
+    "speechRecognition": true
+  },
+  "finishedAt": "2026-10-08T09:18:48.166Z",
+  "passed": true
+}

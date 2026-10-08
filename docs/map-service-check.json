@@ -1,0 +1,135 @@
+{
+  "testedAt": "2026-10-08T09:11:49.936Z",
+  "originDescription": "Known public central London map coordinate; not a user GPS location",
+  "passed": true,
+  "elapsedMs": 4917,
+  "count": 18,
+  "places": [
+    {
+      "id": "node/12877095809",
+      "name": "Charles I",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/12877095809",
+      "meters": 15
+    },
+    {
+      "id": "node/346364767",
+      "name": "Lion",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/346364767",
+      "meters": 56
+    },
+    {
+      "id": "node/346364635",
+      "name": "Lion",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/346364635",
+      "meters": 58
+    },
+    {
+      "id": "node/13891722459",
+      "name": "Endangered Species",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/13891722459",
+      "meters": 66
+    },
+    {
+      "id": "way/1222903661",
+      "name": "Horatio Nelson",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/way/1222903661",
+      "meters": 66
+    },
+    {
+      "id": "node/346364819",
+      "name": "Lion",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/346364819",
+      "meters": 75
+    },
+    {
+      "id": "node/346364721",
+      "name": "Lion",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/346364721",
+      "meters": 77
+    },
+    {
+      "id": "node/9552480430",
+      "name": "Nearby artwork",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/9552480430",
+      "meters": 100
+    },
+    {
+      "id": "node/9552480431",
+      "name": "Nearby artwork",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/9552480431",
+      "meters": 102
+    },
+    {
+      "id": "node/9552480429",
+      "name": "Nearby artwork",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/9552480429",
+      "meters": 104
+    },
+    {
+      "id": "node/9552480432",
+      "name": "Nearby artwork",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/9552480432",
+      "meters": 108
+    },
+    {
+      "id": "way/153342477",
+      "name": "Fourth Plinth",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/way/153342477",
+      "meters": 131
+    },
+    {
+      "id": "node/5582186352",
+      "name": "George Washington",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/5582186352",
+      "meters": 169
+    },
+    {
+      "id": "node/3211564198",
+      "name": "Statue of James II",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/3211564198",
+      "meters": 173
+    },
+    {
+      "id": "node/3688180043",
+      "name": "A Conversation with Oscar Wilde",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/3688180043",
+      "meters": 208
+    },
+    {
+      "id": "node/587985997",
+      "name": "Prince George, Duke of Cambridge",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/587985997",
+      "meters": 231
+    },
+    {
+      "id": "node/1571931922",
+      "name": "Edith Cavell Memorial",
+      "kind": "artwork",
+      "source": "https://www.openstreetmap.org/node/1571931922",
+      "meters": 244
+    },
+    {
+      "id": "way/374960368",
+      "name": "St. James's Park",
+      "kind": "park",
+      "source": "https://www.openstreetmap.org/way/374960368",
+      "meters": 264
+    }
+  ]
+}

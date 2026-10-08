@@ -1,0 +1,23 @@
+databases:
+  - name: ascend-db
+    plan: free
+    region: singapore
+    databaseName: ascend
+services:
+  - type: web
+    name: ascend-quests
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.18.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ascend-db
+          property: connectionString
