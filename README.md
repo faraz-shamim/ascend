@@ -47,7 +47,7 @@ Never place database credentials in frontend code, a public repository, or artic
 
 ## Deploy on Render for $0
 
-`render.yaml` creates a **Free** Node web service and a **Free** Postgres database in Singapore. Build: `npm ci && npm run build`. Start: `npm start`. Health: `/api/health`.
+`render.yaml` creates a **Free** Node web service and a **Free** Postgres database in Singapore. Build: `npm ci --include=dev && npm run build`. Start: `npm start`. Health: `/api/health`.
 
 Render's free web service sleeps after 15 idle minutes and may take about a minute to wake. Its filesystem is ephemeral, so a public deployment needs the external database. Free Render Postgres expires after 30 days and has no backups. Before expiry, export the server database or move to a separately configured free database. This project does not authorize a paid upgrade. Shared free hours, bandwidth, and build limits still apply. See [Render's current free-plan limits](https://render.com/docs/free).
 
