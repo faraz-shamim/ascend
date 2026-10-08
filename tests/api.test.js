@@ -273,6 +273,22 @@ test("Expired quests cannot award XP", async () => {
     410,
   );
 });
+test("GPS map lookup accepts a protected POST body without coordinates in its URL", async () => {
+  const r = await request("/api/places", { origin: DEMO_ORIGIN, radius: 700 });
+  assert.equal(r.status, 200);
+  assert.ok(Array.isArray(r.body.places));
+  assert.equal(
+    (
+      await request(
+        "/api/places",
+        { origin: DEMO_ORIGIN, radius: 700 },
+        "POST",
+        null,
+      )
+    ).status,
+    401,
+  );
+});
 test("Abandoning quests and invalid profile data", async () => {
   assert.equal(
     (await request("/api/quests/active", null, "DELETE")).body.player

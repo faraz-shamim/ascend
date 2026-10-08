@@ -53,13 +53,39 @@ export function createPlaceDiscovery({
             signal: AbortSignal.timeout(22000),
           },
         );
-        if (!response.ok && response.status >= 500 && upstream.requests < upstream.dailyLimit) {
-          console.warn("ASCEND map upstream", JSON.stringify({host:new URL(upstream.url).host,method:"GET",status:response.status}));
+        if (
+          !response.ok &&
+          response.status >= 500 &&
+          upstream.requests < upstream.dailyLimit
+        ) {
+          console.warn(
+            "ASCEND map upstream",
+            JSON.stringify({
+              host: new URL(upstream.url).host,
+              method: "GET",
+              status: response.status,
+            }),
+          );
           upstream.requests++;
-          response=await fetchImpl(upstream.url,{method:"POST",body:new URLSearchParams({data:query}),headers:{"User-Agent":"ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)","Content-Type":"application/x-www-form-urlencoded"},signal:AbortSignal.timeout(22000)});
+          response = await fetchImpl(upstream.url, {
+            method: "POST",
+            body: new URLSearchParams({ data: query }),
+            headers: {
+              "User-Agent":
+                "ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)",
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            signal: AbortSignal.timeout(22000),
+          });
         }
         if (!response.ok) {
-          console.warn("ASCEND map upstream", JSON.stringify({host:new URL(upstream.url).host,status:response.status}));
+          console.warn(
+            "ASCEND map upstream",
+            JSON.stringify({
+              host: new URL(upstream.url).host,
+              status: response.status,
+            }),
+          );
           const retry = Number(response.headers?.get("retry-after"));
           upstream.blockedUntil =
             now() +
@@ -79,8 +105,15 @@ export function createPlaceDiscovery({
         if (cache.size >= 128) cache.delete(cache.keys().next().value);
         cache.set(key, { at: now(), elements: data.elements });
         return data.elements;
-      } catch(error) {
-        console.warn("ASCEND map upstream",JSON.stringify({host:new URL(upstream.url).host,error:error.name,code:error.cause?.code}));
+      } catch (error) {
+        console.warn(
+          "ASCEND map upstream",
+          JSON.stringify({
+            host: new URL(upstream.url).host,
+            error: error.name,
+            code: error.cause?.code,
+          }),
+        );
         upstream.blockedUntil = now() + 10_000;
       }
     }

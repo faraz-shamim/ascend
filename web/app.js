@@ -257,7 +257,10 @@ async function locate() {
     await ensurePlayer();
     s.origin = await getFix();
     s.fix = s.origin;
-    const result = await api("/api/places",{origin:{lat:s.origin.lat,lon:s.origin.lon},radius:Math.min(2500,Math.max(200,s.minutes*35))});
+    const result = await api("/api/places", {
+      origin: { lat: s.origin.lat, lon: s.origin.lon },
+      radius: Math.min(2500, Math.max(200, s.minutes * 35)),
+    });
     s.places = result.places;
     s.view = "quests";
     closeModal(false);

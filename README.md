@@ -6,7 +6,7 @@ A location-based outdoor adventure game built for Hacktoberfest Week 1, October 
 
 ## Play
 
-The public deployment is being prepared. Run the complete app locally with the commands below. The permission-free rehearsal uses labelled fictional places and simulated check-ins; its rewards never enter world rankings.
+[Open the playable preview](https://ascend-quests.onrender.com). Persistent Postgres is provisioned and awaiting its connection configuration; the preview currently uses temporary server storage. Run the complete app locally with the commands below. The permission-free rehearsal uses labelled fictional places and simulated check-ins; its rewards never enter world rankings.
 
 ## Features
 
@@ -62,7 +62,7 @@ node scripts/gemma-qa.mjs
 
 The browser QA script currently uses an installed Windows Chrome path. Set `ASCEND_BROWSER_PATH` to another installed Chromium executable when running elsewhere. The unit/API/Postgres tests and production build run in GitHub Actions on Linux.
 
-- 24 automated checks cover coordinate validation, camera metadata, grounded destinations, XP/progression, auth/privacy, concurrent duplicate claims, cooldowns, weekly scores, quest expiry, Postgres rollback, and cleanup.
+- 28 automated checks cover coordinate validation, camera metadata, grounded destinations, XP/progression, auth/privacy, concurrent duplicate claims, cooldowns, weekly scores, quest expiry, Postgres rollback, and cleanup.
 - 19 browser QA scenarios exercise the main UI and server flows with **simulated GPS and a synthetic camera feed**, including responsive screens and journal privacy. It is not evidence of an outdoor visit.
 - Genuine local Gemma inference is recorded in [docs/gemma-inference.json](docs/gemma-inference.json). The compact model produced a story in about 3.45 seconds on the test browser's GPU; the first download and generation took about 28.6 seconds. This is one device measurement, not a universal performance guarantee.
 - Browser speech capability detection, button fallback, and voice-command actions using a synthesized transcript were tested. The headless browser had no installed local voice, so audible playback and live microphone transcription require device testing.

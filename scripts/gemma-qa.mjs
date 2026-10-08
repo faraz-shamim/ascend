@@ -9,6 +9,7 @@ const report = {
     "Fictional rehearsal place; real browser-local Gemma inference; no hosted AI API",
   runs: [],
   consoleErrors: [],
+  failedRequests: [],
 };
 let browser, server, store, page;
 try {
@@ -25,6 +26,12 @@ try {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
   });
+  context.on("requestfailed", (request) =>
+    report.failedRequests.push({
+      url: new URL(request.url()).origin + new URL(request.url()).pathname,
+      error: request.failure()?.errorText,
+    }),
+  );
   page = await context.newPage();
   page.on("pageerror", (e) => report.consoleErrors.push(e.message));
   await page.goto("http://127.0.0.1:4176", { waitUntil: "networkidle" });
@@ -53,7 +60,20 @@ try {
       } catch {}
     }, 15000);
     try {
-      await page.locator(".active-quest").waitFor({ timeout: 9 * 60 * 1000 });
+      await Promise.race([
+        page.locator(".active-quest").waitFor({ timeout: 9 * 60 * 1000 }),
+        page
+          .getByRole("heading", {
+            name: "Your device needs another route",
+            exact: true,
+          })
+          .waitFor({ timeout: 9 * 60 * 1000 })
+          .then(async () => {
+            throw new Error(
+              JSON.stringify(await page.evaluate(() => window.qaAI)),
+            );
+          }),
+      ]);
     } finally {
       clearInterval(progress);
     }

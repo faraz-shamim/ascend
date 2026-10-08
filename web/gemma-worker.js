@@ -1,4 +1,6 @@
 import { pipeline, env, TextStreamer } from "@huggingface/transformers";
+import { createModelFetch } from "./lib/download.js";
+env.fetch = createModelFetch();
 env.allowLocalModels = false;
 if (env.backends?.onnx?.wasm) env.backends.onnx.wasm.numThreads = 1;
 let generator, runtime, selected;

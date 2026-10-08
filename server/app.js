@@ -93,7 +93,7 @@ export async function createApp(options = {}) {
       durable: store.durable,
       model: "browser-local Gemma 3",
       version: "1.0.0",
-      commit:process.env.RENDER_GIT_COMMIT || null,
+      commit: process.env.RENDER_GIT_COMMIT || null,
     }),
   );
   app.post("/api/players", async (req, res, next) => {
@@ -161,7 +161,24 @@ export async function createApp(options = {}) {
       next(e);
     }
   });
-  app.post("/api/places",auth,async(req,res,next)=>{try{const origin=req.body.origin,radius=Number(req.body.radius||800),result=await discover(origin,radius);const used=new Set(req.player.completed.filter(x=>x.at>now()-24*60*60*1000).flatMap(x=>x.places));res.json({...result,places:result.places.filter(p=>!used.has(hash(p.id)))});}catch(e){next(e);}});
+  app.post("/api/places", auth, async (req, res, next) => {
+    try {
+      const origin = req.body.origin,
+        radius = Number(req.body.radius || 800),
+        result = await discover(origin, radius);
+      const used = new Set(
+        req.player.completed
+          .filter((x) => x.at > now() - 24 * 60 * 60 * 1000)
+          .flatMap((x) => x.places),
+      );
+      res.json({
+        ...result,
+        places: result.places.filter((p) => !used.has(hash(p.id))),
+      });
+    } catch (e) {
+      next(e);
+    }
+  });
   app.post("/api/quests", auth, async (req, res, next) => {
     try {
       const { origin, type, theme, minutes, narrative, placeIds } = req.body;
@@ -354,14 +371,12 @@ export async function createApp(options = {}) {
   app.use((error, req, res, next) => {
     if (res.headersSent) return next(error);
     const status = error.status || 500;
-    res
-      .status(status)
-      .json({
-        error:
-          error.expose || status < 500
-            ? error.message
-            : "The guild is temporarily unavailable. Your saved progress is safe.",
-      });
+    res.status(status).json({
+      error:
+        error.expose || status < 500
+          ? error.message
+          : "The guild is temporarily unavailable. Your saved progress is safe.",
+    });
     if (status >= 500) console.error("ASCEND server error:", error.message);
   });
   return { app, store };
