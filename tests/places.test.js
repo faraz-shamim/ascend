@@ -66,7 +66,8 @@ test("Primary outage switches to a public fallback with the same coarse search",
       requests.push({
         url,
         method: options.method,
-        body: options.body.toString(),
+        query:
+          options.body?.get("data") || new URL(url).searchParams.get("data"),
       });
       return url.includes("private.coffee")
         ? new Response("", { status: 500 })
@@ -77,9 +78,10 @@ test("Primary outage switches to a public fallback with the same coarse search",
   assert.equal(result.places[0].source, "https://www.openstreetmap.org/node/1");
   assert.equal(requests.length, 2);
   assert.equal(new URL(requests[1].url).hostname, "maps.mail.ru");
-  assert.equal(requests[0].body, requests[1].body);
-  assert.ok(requests.every((r) => r.method === "POST" && !r.url.includes("?")));
-  const query = new URLSearchParams(requests[0].body).get("data");
-  assert.ok(query.includes("51.507,-0.128"));
-  assert.ok(!query.includes("51.5072"));
+  assert.equal(requests[0].query, requests[1].query);
+  assert.equal(requests[0].method, "POST");
+  assert.ok(!requests[0].url.includes("?"));
+  assert.equal(requests[1].method, "GET");
+  assert.ok(requests[0].query.includes("51.507,-0.128"));
+  assert.ok(!requests[0].query.includes("51.5072"));
 });

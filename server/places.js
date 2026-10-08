@@ -12,16 +12,19 @@ export function createPlaceDiscovery({
   const upstreams = [
     {
       url: "https://overpass.private.coffee/api/interpreter",
+      method: "POST",
       dailyLimit: 1000,
       byteLimit: 50_000_000,
     },
     {
       url: "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+      method: "GET",
       dailyLimit: 500,
       byteLimit: 25_000_000,
     },
     {
       url: "https://overpass-api.de/api/interpreter",
+      method: "POST",
       dailyLimit: 100,
       byteLimit: 10_000_000,
     },
@@ -47,9 +50,14 @@ export function createPlaceDiscovery({
         continue;
       upstream.requests++;
       try {
-        const response = await fetchImpl(upstream.url, {
-          method: "POST",
-          body: new URLSearchParams({ data: query }),
+        const params = new URLSearchParams({ data: query });
+        const url =
+          upstream.method === "GET"
+            ? upstream.url + "?" + params
+            : upstream.url;
+        const response = await fetchImpl(url, {
+          method: upstream.method,
+          ...(upstream.method === "POST" ? { body: params } : {}),
           headers: {
             "User-Agent":
               "ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)",
