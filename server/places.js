@@ -16,6 +16,11 @@ export function createPlaceDiscovery({
       byteLimit: 50_000_000,
     },
     {
+      url: "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+      dailyLimit: 500,
+      byteLimit: 25_000_000,
+    },
+    {
       url: "https://overpass-api.de/api/interpreter",
       dailyLimit: 100,
       byteLimit: 10_000_000,
@@ -29,7 +34,7 @@ export function createPlaceDiscovery({
   }));
   let queue = Promise.resolve();
   async function lookup(origin, radius, key) {
-    const query = `[out:json][timeout:18];(nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[leisure~"^(park|garden|recreation_ground)$"];nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[tourism~"^(artwork|viewpoint)$"];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[natural=tree][name];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[amenity=fountain];);out tags center geom;`;
+    const query = `[out:json][timeout:25];(nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[leisure~"^(park|garden|recreation_ground)$"];nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[tourism~"^(artwork|viewpoint)$"];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[natural=tree][name];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[amenity=fountain];);out tags center geom;`;
     for (const upstream of upstreams) {
       const day = new Date(now()).toISOString().slice(0, 10);
       if (upstream.day !== day)
@@ -42,42 +47,16 @@ export function createPlaceDiscovery({
         continue;
       upstream.requests++;
       try {
-        let response = await fetchImpl(
-          upstream.url + "?" + new URLSearchParams({ data: query }),
-          {
-            method: "GET",
-            headers: {
-              "User-Agent":
-                "ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)",
-            },
-            signal: AbortSignal.timeout(22000),
+        const response = await fetchImpl(upstream.url, {
+          method: "POST",
+          body: new URLSearchParams({ data: query }),
+          headers: {
+            "User-Agent":
+              "ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
-        );
-        if (
-          !response.ok &&
-          response.status >= 500 &&
-          upstream.requests < upstream.dailyLimit
-        ) {
-          console.warn(
-            "ASCEND map upstream",
-            JSON.stringify({
-              host: new URL(upstream.url).host,
-              method: "GET",
-              status: response.status,
-            }),
-          );
-          upstream.requests++;
-          response = await fetchImpl(upstream.url, {
-            method: "POST",
-            body: new URLSearchParams({ data: query }),
-            headers: {
-              "User-Agent":
-                "ASCEND/1.0 (+https://github.com/faraz-shamim/ascend)",
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            signal: AbortSignal.timeout(22000),
-          });
-        }
+          signal: AbortSignal.timeout(35000),
+        });
         if (!response.ok) {
           console.warn(
             "ASCEND map upstream",

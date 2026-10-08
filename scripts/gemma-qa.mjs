@@ -3,7 +3,14 @@ import { createApp } from "../server/app.js";
 import { createStore } from "../server/store.js";
 import { writeFile } from "node:fs/promises";
 import assert from "node:assert/strict";
+const cpu = process.env.ASCEND_QA_DEVICE === "wasm";
+const reportPath = cpu
+  ? "docs/gemma-cpu-inference.json"
+  : "docs/gemma-inference.json";
 const report = {
+  deviceTest: cpu
+    ? "WebGPU disabled in the fresh test browser; real CPU/WASM inference"
+    : "Real WebGPU inference",
   startedAt: new Date().toISOString(),
   input:
     "Fictional rehearsal place; real browser-local Gemma inference; no hosted AI API",
@@ -22,6 +29,7 @@ try {
       process.env.ASCEND_BROWSER_PATH ||
       "C:/Program Files/Google/Chrome/Application/chrome.exe",
     headless: true,
+    args: cpu ? ["--disable-gpu", "--disable-blink-features=WebGPU"] : [],
   });
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
@@ -99,7 +107,7 @@ try {
     await page.evaluate(() => scrollTo(0, 0));
     await page.waitForTimeout(5500);
     await page.screenshot({
-      path: `docs/ascend-gemma-${mode}.png`,
+      path: cpu ? "docs/ascend-gemma-cpu.png" : `docs/ascend-gemma-${mode}.png`,
       fullPage: true,
     });
     await page
@@ -127,7 +135,7 @@ try {
   }
   process.exitCode = 1;
 } finally {
-  await writeFile("docs/gemma-inference.json", JSON.stringify(report, null, 2));
+  await writeFile(reportPath, JSON.stringify(report, null, 2));
   await browser?.close();
   if (server) await new Promise((r) => server.close(r));
   await store?.close();

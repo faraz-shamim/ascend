@@ -1,20 +1,26 @@
 {
-  "startedAt": "2026-10-08T08:51:14.719Z",
+  "startedAt": "2026-10-08T09:56:21.418Z",
   "input": "Fictional rehearsal place; real browser-local Gemma inference; no hosted AI API",
   "runs": [
     {
       "mode": "small",
-      "totalLoadAndGenerateMs": 28586,
+      "totalLoadAndGenerateMs": 98534,
       "model": "onnx-community/gemma-3-270m-it-ONNX",
       "runtime": "webgpu",
       "revision": "2dbbfdb1b59bd034eb959428c6a7da9dd7ea27f0",
-      "inferenceMs": 3449,
+      "inferenceMs": 5099,
       "prompt": "Give a short fairy-tale description of a quiet walk in The Lantern Garden. Describe nature and a friendly animal. Write two sentences. No battles or questions.",
       "output": "The Lantern Garden whispered secrets as the sun warmed the mossy leaves, a gentle breeze rustled the silver petals of the flowers. A plump robin perched on a nearby branch, its bright yellow eyes gleaming with curiosity.",
       "checkpointCoordinatesUnchanged": true
     }
   ],
   "consoleErrors": [],
+  "failedRequests": [
+    {
+      "url": "https://us.aws.cdn.hf.co/xet-bridge-us/6894c5d9089886e51ef3651f/39a539cdcd092abc3e5f04951735bf2de06192f3427dea61692326fdd9229ebf",
+      "error": "net::ERR_CONNECTION_RESET"
+    }
+  ],
   "passed": true,
-  "finishedAt": "2026-10-08T08:51:51.230Z"
+  "finishedAt": "2026-10-08T09:58:07.554Z"
 }

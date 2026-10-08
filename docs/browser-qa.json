@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-10-08T09:18:16.703Z",
+  "startedAt": "2026-10-08T10:26:57.324Z",
   "environment": "Fresh automated Chromium; simulated GPS and synthetic camera feed; no outdoor visit claimed",
   "checks": [
     {
@@ -71,20 +71,7 @@
       "passed": true,
       "detail": {
         "speechSynthesis": true,
-        "localVoices": [
-          {
-            "name": "Microsoft David - English (United States)",
-            "lang": "en-US"
-          },
-          {
-            "name": "Microsoft Mark - English (United States)",
-            "lang": "en-US"
-          },
-          {
-            "name": "Microsoft Zira - English (United States)",
-            "lang": "en-US"
-          }
-        ],
+        "localVoices": [],
         "speechRecognition": true
       }
     },
@@ -98,24 +85,16 @@
     }
   ],
   "errors": [],
+  "camera": {
+    "width": 1280,
+    "height": 720,
+    "readyState": 4
+  },
   "voice": {
     "speechSynthesis": true,
-    "localVoices": [
-      {
-        "name": "Microsoft David - English (United States)",
-        "lang": "en-US"
-      },
-      {
-        "name": "Microsoft Mark - English (United States)",
-        "lang": "en-US"
-      },
-      {
-        "name": "Microsoft Zira - English (United States)",
-        "lang": "en-US"
-      }
-    ],
+    "localVoices": [],
     "speechRecognition": true
   },
-  "finishedAt": "2026-10-08T09:18:48.166Z",
+  "finishedAt": "2026-10-08T10:27:28.821Z",
   "passed": true
 }

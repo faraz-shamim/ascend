@@ -164,6 +164,10 @@ try {
     .click();
   await page.locator(".active-quest").waitFor();
   await page.evaluate(() => {
+    window.qaNativeRecognition = {
+      standard: window.SpeechRecognition,
+      prefixed: window.webkitSpeechRecognition,
+    };
     class Recognition {
       start() {
         setTimeout(
@@ -186,6 +190,11 @@ try {
   await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
   await page.getByRole("button", { name: "Resume", exact: true }).click();
   await page.getByRole("button", { name: "Close dialog" }).click();
+  await page.evaluate(() => {
+    window.SpeechRecognition = window.qaNativeRecognition.standard;
+    window.webkitSpeechRecognition = window.qaNativeRecognition.prefixed;
+    delete window.qaNativeRecognition;
+  });
   check(
     "Voice command action and pause/resume using a synthesized transcript; no live audio",
   );
@@ -215,9 +224,22 @@ try {
   });
   await page.getByRole("button", { name: "Open camera", exact: true }).click();
   await page.getByRole("button", { name: "Start camera", exact: true }).click();
-  await page.waitForFunction(
-    () => document.querySelector("#camera-preview")?.videoWidth > 0,
-  );
+  await page.waitForFunction(() => {
+    const video = document.querySelector("#camera-preview");
+    return (
+      video?.readyState >= 2 &&
+      video.videoWidth >= 320 &&
+      video.videoHeight >= 240
+    );
+  });
+  report.camera = await page.evaluate(() => {
+    const v = document.querySelector("#camera-preview");
+    return {
+      width: v.videoWidth,
+      height: v.videoHeight,
+      readyState: v.readyState,
+    };
+  });
   await page
     .getByRole("button", { name: "Capture discovery", exact: true })
     .click();

@@ -1,8 +1,8 @@
 {
-  "testedAt": "2026-10-08T09:11:49.936Z",
+  "testedAt": "2026-10-08T10:24:45.686Z",
   "originDescription": "Known public central London map coordinate; not a user GPS location",
   "passed": true,
-  "elapsedMs": 4917,
+  "elapsedMs": 17323,
   "count": 18,
   "places": [
     {

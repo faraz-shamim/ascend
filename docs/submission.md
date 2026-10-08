@@ -36,7 +36,7 @@ There is no streak punishment. A quiet walk tomorrow is still welcome if you mis
 
 ## Demo
 
-**[Play ASCEND]({{DEMO_URL}})**
+**[Play ASCEND](https://ascend-quests.onrender.com)**
 
 Start with **Try the rehearsal** to explore all three quest types without GPS, camera permissions, or an account. Its places and arrivals are explicitly fictional, and its scores never enter the global leaderboard.
 
@@ -60,7 +60,7 @@ The code is MIT-licensed. The generated art has its own attribution instructions
 
 ### A story layer grounded in an actual map
 
-The map service uses Overpass to find eligible nearby places. Known private and indoor locations are filtered out. Access tags and OpenStreetMap source links remain visible because a mapped place is not proof that it is open or reachable by a pedestrian route.
+The map service uses Overpass to find eligible nearby places. Private.coffee is the primary provider; VK Maps and FOSSGIS supply bounded fallbacks when it is unavailable. Searches are cached and shared across concurrent explorers. Known private and indoor locations are filtered out. Access tags and OpenStreetMap source links remain visible because a mapped place is not proof that it is open or reachable by a pedestrian route.
 
 Gemma writes the story; a separate quest engine pins the destinations, objectives, and XP. The model cannot invent a destination or grant rewards. Long, code-like, or unsuitable narratives fall back to a clearly labelled curated briefing.
 
@@ -74,7 +74,11 @@ A genuine browser inference produced this line:
 
 > The Lantern Garden whispered secrets as the sun warmed the mossy leaves, a gentle breeze rustled the silver petals of the flowers.
 
-On the tested browser, generation took **3.45 seconds**. The first model download plus generation took **28.6 seconds**. Those are measurements from one machine, not a promise for every phone. The full prompt, output, revision, and timings are recorded in [the inference report](https://github.com/faraz-shamim/ascend/blob/main/docs/gemma-inference.json).
+On the tested browser, generation took **5.1 seconds**. The first model download plus generation took **98.5 seconds**. Those are measurements from one machine, not a promise for every phone. The full prompt, output, revision, and timings are recorded in [the inference report](https://github.com/faraz-shamim/ascend/blob/main/docs/gemma-inference.json).
+
+The CPU fallback was tested with WebGPU disabled: **33.1 seconds** for generation and **170.4 seconds** including the first download, on the same computer. Its [separate report](https://github.com/faraz-shamim/ascend/blob/main/docs/gemma-cpu-inference.json) records actual WASM inference.
+
+Large model downloads also exposed interrupted CDN transfers during testing. The loader now fetches pinned artifacts in verified 8 MiB ranges, retries interrupted chunks, and rejects mismatched revisions. This made both real GPU and CPU runs complete.
 
 ![A real local Gemma story for the explicitly fictional rehearsal destination](https://raw.githubusercontent.com/faraz-shamim/ascend/main/docs/ascend-gemma-small.png)
 
@@ -92,7 +96,7 @@ Render’s free service can take about a minute to wake, and its free Postgres e
 
 ### What I actually verified
 
-- **24 automated tests** cover auth, GPS validation, camera metadata, progression, cooldowns, duplicate rewards, map caching and backoff, and Postgres rollback and cleanup.
+- **29 automated tests** cover auth, GPS validation, camera metadata, progression, cooldowns, duplicate rewards, map caching and backoff, and Postgres rollback and cleanup.
 - **19 browser scenarios** cover the quest flows, camera capture, companions, trophies, rankings, session export/restore, journal deletion, and every screen at 390 px width.
 - A separate check returned **18 real mapped landmarks** near a public central London test coordinate.
 - Gemma’s inference ran for real in the browser; its measured output is linked above.

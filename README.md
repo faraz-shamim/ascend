@@ -62,15 +62,16 @@ node scripts/gemma-qa.mjs
 
 The browser QA script currently uses an installed Windows Chrome path. Set `ASCEND_BROWSER_PATH` to another installed Chromium executable when running elsewhere. The unit/API/Postgres tests and production build run in GitHub Actions on Linux.
 
-- 28 automated checks cover coordinate validation, camera metadata, grounded destinations, XP/progression, auth/privacy, concurrent duplicate claims, cooldowns, weekly scores, quest expiry, Postgres rollback, and cleanup.
+- 29 automated checks cover coordinate validation, camera metadata, grounded destinations, XP/progression, auth/privacy, concurrent duplicate claims, cooldowns, weekly scores, quest expiry, Postgres rollback, and cleanup.
 - 19 browser QA scenarios exercise the main UI and server flows with **simulated GPS and a synthetic camera feed**, including responsive screens and journal privacy. It is not evidence of an outdoor visit.
-- Genuine local Gemma inference is recorded in [docs/gemma-inference.json](docs/gemma-inference.json). The compact model produced a story in about 3.45 seconds on the test browser's GPU; the first download and generation took about 28.6 seconds. This is one device measurement, not a universal performance guarantee.
-- Browser speech capability detection, button fallback, and voice-command actions using a synthesized transcript were tested. The headless browser had no installed local voice, so audible playback and live microphone transcription require device testing.
+- Genuine local Gemma inference is recorded in [docs/gemma-inference.json](docs/gemma-inference.json). The compact model produced a story in about 5.1 seconds on the test browser's GPU; the first download and generation took about 98.5 seconds. This is one device measurement, not a universal performance guarantee.
+- CPU/WASM inference was also run with WebGPU disabled: about 33.1 seconds to generate, 170.4 seconds including the first download. See [docs/gemma-cpu-inference.json](docs/gemma-cpu-inference.json). Interrupted model downloads recover through verified 8 MiB ranges with bounded retries.
+- Browser speech capability detection, button fallback, and voice-command actions using a synthesized transcript were tested. Playback controls and button fallback were exercised; audible playback and live microphone transcription still require physical-device testing.
 - [docs/browser-qa.json](docs/browser-qa.json), [docs/map-service-check.json](docs/map-service-check.json), and screenshots document the checks.
 
 ## Privacy and limits
 
-Location is requested when the explorer asks for nearby quests. Coordinates are used by ASCEND for the public map lookup and check-in validation. Public Overpass providers (Private.coffee, with FOSSGIS Overpass as fallback) receive a search area rounded to approximately 100 m. OpenStreetMap receives tiles for the displayed area. Searches are cached for 15 minutes, duplicate requests are coalesced, and upstream calls are serialized and capped. No continuous movement trail is saved.
+Location is requested when the explorer asks for nearby quests. Coordinates are used by ASCEND for the public map lookup and check-in validation. Public Overpass providers (Private.coffee, with VK Maps and FOSSGIS Overpass as fallbacks) receive a search area rounded to approximately 100 m. OpenStreetMap receives tiles for the displayed area. Searches are cached for 15 minutes, duplicate requests are coalesced, and upstream calls are serialized and capped. No continuous movement trail is saved.
 
 The server temporarily holds active-quest destinations. Expired destinations are cleared by a periodic cleanup, within 15 minutes after the four-hour quest expiry. Completed records contain hashes of place IDs and completion metadata for cooldowns. Public rankings expose only aliases and aggregate game statistics.
 

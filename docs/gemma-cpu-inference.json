@@ -1,0 +1,22 @@
+{
+  "deviceTest": "WebGPU disabled in the fresh test browser; real CPU/WASM inference",
+  "startedAt": "2026-10-08T10:02:57.480Z",
+  "input": "Fictional rehearsal place; real browser-local Gemma inference; no hosted AI API",
+  "runs": [
+    {
+      "mode": "small",
+      "totalLoadAndGenerateMs": 170417,
+      "model": "onnx-community/gemma-3-270m-it-ONNX",
+      "runtime": "wasm",
+      "revision": "cfd5c04f84a64766d63efc5bb1d2cf31f34a4a90",
+      "inferenceMs": 33055,
+      "prompt": "Give a short fairy-tale description of a quiet walk in The Lantern Garden. Describe nature and a friendly animal. Write two sentences. No battles or questions.",
+      "output": "The Lantern Garden is a peaceful sanctuary nestled amongst the whispering leaves, its gentle scent a sweet perfume that invites you to indulge in its tranquility. A friendly animal, with bright eyes and nimble paws, follows every step, its joyful melodies echoing through the grove, a reminder of the beauty found in simplicity.",
+      "checkpointCoordinatesUnchanged": true
+    }
+  ],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "passed": true,
+  "finishedAt": "2026-10-08T10:05:55.379Z"
+}

@@ -58,3 +58,28 @@ test("All map services unavailable produces a playable-rehearsal fallback", asyn
     (error) => error.status === 503 && error.message.includes("rehearsal"),
   );
 });
+
+test("Primary outage switches to a public fallback with the same coarse search", async () => {
+  const requests = [];
+  const discover = createPlaceDiscovery({
+    fetchImpl: async (url, options) => {
+      requests.push({
+        url,
+        method: options.method,
+        body: options.body.toString(),
+      });
+      return url.includes("private.coffee")
+        ? new Response("", { status: 500 })
+        : ok();
+    },
+  });
+  const result = await discover(origin, 700);
+  assert.equal(result.places[0].source, "https://www.openstreetmap.org/node/1");
+  assert.equal(requests.length, 2);
+  assert.equal(new URL(requests[1].url).hostname, "maps.mail.ru");
+  assert.equal(requests[0].body, requests[1].body);
+  assert.ok(requests.every((r) => r.method === "POST" && !r.url.includes("?")));
+  const query = new URLSearchParams(requests[0].body).get("data");
+  assert.ok(query.includes("51.507,-0.128"));
+  assert.ok(!query.includes("51.5072"));
+});

@@ -238,7 +238,7 @@ function locationDialog() {
   }
   modal(
     "Find the world around you",
-    `<div class="dialog-symbol">${icon("compass")}</div><p>Share a fresh GPS fix to find mapped parks, gardens, landmarks, and other outdoor places within your chosen adventure time.</p><ul class="privacy-list"><li>Coordinates go to ASCEND’s server for a map lookup. The public Overpass provider receives an approximate search area.</li><li>Map tiles reveal the displayed area to OpenStreetMap.</li><li>Camera photos stay on your device. Public rankings never show locations.</li></ul><label class="dialog-label">Time available<select id="find-minutes">${[10, 20, 30, 45, 60].map((m) => `<option value="${m}" ${s.minutes === m ? "selected" : ""}>${m} minutes</option>`).join("")}</select></label><div class="dialog-actions"><button class="button primary" data-action="locate">${icon("pin")} Use my location</button><button class="button subtle" data-action="demo-modal">Try without permissions</button></div><p class="small-print">Mapped access is incomplete. Check opening hours and use public pedestrian paths. Distances are straight-line estimates.</p>`,
+    `<div class="dialog-symbol">${icon("compass")}</div><p>Share a fresh GPS fix to find mapped parks, gardens, landmarks, and other outdoor places within your chosen adventure time.</p><ul class="privacy-list"><li>Coordinates go to ASCEND’s server for a map lookup. Overpass providers receive an approximate search area: <a href="https://overpass.private.coffee/" target="_blank" rel="noopener">Private.coffee</a>, with <a href="https://maps.mail.ru/osm/tools/overpass/" target="_blank" rel="noopener">VK Maps</a> and <a href="https://overpass-api.de/" target="_blank" rel="noopener">FOSSGIS</a> as fallbacks.</li><li>Map tiles reveal the displayed area to OpenStreetMap.</li><li>Camera photos stay on your device. Public rankings never show locations.</li></ul><label class="dialog-label">Time available<select id="find-minutes">${[10, 20, 30, 45, 60].map((m) => `<option value="${m}" ${s.minutes === m ? "selected" : ""}>${m} minutes</option>`).join("")}</select></label><div class="dialog-actions"><button class="button primary" data-action="locate">${icon("pin")} Use my location</button><button class="button subtle" data-action="demo-modal">Try without permissions</button></div><p class="small-print">Mapped access is incomplete. Check opening hours and use public pedestrian paths. Distances are straight-line estimates.</p>`,
     "location",
   );
 }
@@ -534,8 +534,8 @@ async function startCamera() {
     cameraStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
+        width: { min: 320, ideal: 1280 },
+        height: { min: 240, ideal: 720 },
       },
       audio: false,
     });
@@ -561,8 +561,13 @@ async function startCamera() {
 }
 async function capturePhoto() {
   const video = document.querySelector("#camera-preview");
-  if (!video?.videoWidth) {
-    toast("Wait for the camera preview to appear.");
+  if (
+    !video ||
+    video.readyState < 2 ||
+    video.videoWidth < 320 ||
+    video.videoHeight < 240
+  ) {
+    toast("Wait for a clear camera preview, then try capturing again.");
     return;
   }
   const canvas = document.createElement("canvas");
