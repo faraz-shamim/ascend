@@ -1,0 +1,38 @@
+{
+  "verifiedAt": "2026-10-08T11:42:02.150Z",
+  "url": "https://dev.to/faraz_s_0a6e70a4bbdc6622/ascend-turn-a-small-walk-into-a-real-world-quest-with-local-gemma-2347",
+  "apiPublished": true,
+  "correctAuthor": true,
+  "challengeTags": "devchallenge, hf26challenge, gemma, webdev",
+  "coverPresent": true,
+  "pageStatus": 200,
+  "images": [
+    {
+      "alt": "Cover image for ASCEND: Turn a Small Walk into a Real-World Quest with Local Gemma",
+      "loaded": true,
+      "width": 1000,
+      "height": 421
+    },
+    {
+      "alt": "ASCEND’s companion collection, shown with labelled rehearsal progress",
+      "loaded": true,
+      "width": 800,
+      "height": 839
+    },
+    {
+      "alt": "The actual ASCEND quest board",
+      "loaded": true,
+      "width": 800,
+      "height": 866
+    },
+    {
+      "alt": "A real local Gemma story for the explicitly fictional rehearsal destination",
+      "loaded": true,
+      "width": 800,
+      "height": 878
+    }
+  ],
+  "mobileOverflow": false,
+  "publicPageVerified": true,
+  "passed": true
+}

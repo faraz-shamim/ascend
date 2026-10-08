@@ -8,6 +8,8 @@ A location-based outdoor adventure game built for Hacktoberfest Week 1, October 
 
 [Play ASCEND](https://ascend-quests.onrender.com). Explorer state and world rankings use persistent Render Postgres. Run the complete app locally with the commands below. The permission-free rehearsal uses labelled fictional places and simulated check-ins; its rewards never enter world rankings.
 
+[Read the illustrated DEV submission](https://dev.to/faraz_s_0a6e70a4bbdc6622/ascend-turn-a-small-walk-into-a-real-world-quest-with-local-gemma-2347).
+
 ## Features
 
 - Three quest types: one-place gates, camera discoveries, and three-checkpoint trails.

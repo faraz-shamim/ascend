@@ -1,6 +1,6 @@
 ---
 title: "ASCEND: Turn a Small Walk into a Real-World Quest with Local Gemma"
-published: false
+published: true
 tags: devchallenge, hf26challenge, gemma, webdev
 cover_image: https://raw.githubusercontent.com/faraz-shamim/ascend/main/web/public/art/ascend-cover.webp
 description: "An anime-inspired outdoor adventure with real mapped quests, local Gemma stories, private discoveries, and companions worth stepping outside for."
