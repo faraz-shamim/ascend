@@ -52,7 +52,7 @@ Browser GPS pauses when the page is hidden or the phone is locked, so ASCEND ask
 
 [Source, setup, tests, and deployment configuration](https://github.com/faraz-shamim/ascend)
 
-{% github https://github.com/faraz-shamim/ascend %}
+Explore the [quest engine](https://github.com/faraz-shamim/ascend/blob/main/web/lib/domain.js), [Gemma worker](https://github.com/faraz-shamim/ascend/blob/main/web/gemma-worker.js), or [deployment configuration](https://github.com/faraz-shamim/ascend/blob/main/render.yaml). The README includes the commands to run it yourself.
 
 The code is MIT-licensed. The generated art has its own attribution instructions, and downloaded model weights retain Gemma’s terms.
 

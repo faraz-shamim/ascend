@@ -34,7 +34,7 @@ export function createPlaceDiscovery({
   }));
   let queue = Promise.resolve();
   async function lookup(origin, radius, key) {
-    const query = `[out:json][timeout:25];(nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[leisure~"^(park|garden|recreation_ground)$"];nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[tourism~"^(artwork|viewpoint)$"];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[natural=tree][name];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[amenity=fountain];);out tags center geom;`;
+    const query = `[out:json][timeout:18][maxsize:67108864];(nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[leisure~"^(park|garden|recreation_ground)$"];nwr(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[tourism~"^(artwork|viewpoint)$"];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[natural=tree][name];node(around:${Math.ceil(radius) + 90},${origin.lat.toFixed(3)},${origin.lon.toFixed(3)})[amenity=fountain];);out tags center geom;`;
     for (const upstream of upstreams) {
       const day = new Date(now()).toISOString().slice(0, 10);
       if (upstream.day !== day)
@@ -58,18 +58,30 @@ export function createPlaceDiscovery({
           signal: AbortSignal.timeout(35000),
         });
         if (!response.ok) {
+          const rejection = await response.text().catch(() => "");
+          upstream.bytes += Buffer.byteLength(rejection);
+          const reason = /timed out|timeout/i.test(rejection)
+            ? "query-timeout"
+            : /dispatcher|quota|resource|not enough/i.test(rejection)
+              ? "resource-unavailable"
+              : /<html|<!doctype/i.test(rejection)
+                ? "provider-html-error"
+                : "provider-response-error";
           console.warn(
             "ASCEND map upstream",
             JSON.stringify({
               host: new URL(upstream.url).host,
               status: response.status,
+              reason,
             }),
           );
           const retry = Number(response.headers?.get("retry-after"));
           upstream.blockedUntil =
             now() +
             Math.max(
-              response.status === 429 || response.status === 406
+              response.status === 429 ||
+                response.status === 406 ||
+                response.status >= 500
                 ? 30_000
                 : 10_000,
               Number.isFinite(retry) ? Math.min(retry * 1000, 86_400_000) : 0,
