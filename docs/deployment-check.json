@@ -1,0 +1,73 @@
+{
+  "testedAt": "2026-10-08T11:31:29.657Z",
+  "url": "https://ascend-quests.onrender.com",
+  "releaseCommit": "c08374b42959b8ed89d91466167b41e3d659d215",
+  "checks": [
+    {
+      "name": "Public API health",
+      "passed": true,
+      "detail": {
+        "ok": true,
+        "app": "ASCEND",
+        "storage": "postgres",
+        "durable": true,
+        "model": "browser-local Gemma 3",
+        "version": "1.0.0",
+        "commit": "c08374b42959b8ed89d91466167b41e3d659d215"
+      }
+    },
+    {
+      "name": "Expected source release deployed",
+      "passed": true
+    },
+    {
+      "name": "Persistent Postgres connected",
+      "passed": true
+    },
+    {
+      "name": "Public frontend",
+      "passed": true
+    },
+    {
+      "name": "Unauthenticated profile blocked",
+      "passed": true
+    },
+    {
+      "name": "Private explorer created",
+      "passed": true
+    },
+    {
+      "name": "Real mapped destinations through deployed API",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "count": 18,
+        "elapsedMs": 16390,
+        "sources": [
+          "www.openstreetmap.org"
+        ]
+      }
+    },
+    {
+      "name": "A grounded quest is saved without claiming a visit or reward",
+      "passed": true
+    },
+    {
+      "name": "Test explorer excluded from rankings",
+      "passed": true
+    },
+    {
+      "name": "Explorer and active quest survive a service restart",
+      "passed": true,
+      "restartMethod": "Redeployed the same tested commit with retained build cache",
+      "deployId": "dep-db3nvh7avr4c73aids60",
+      "restartedAt": "2026-10-08T11:35:38.192403Z",
+      "verifiedAt": "2026-10-08T11:36:43.698Z",
+      "noRewardClaimed": true
+    }
+  ],
+  "physicalVisit": false,
+  "persistentDatabaseConnected": true,
+  "passed": true,
+  "restartVerified": true
+}

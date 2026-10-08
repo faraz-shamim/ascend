@@ -88,7 +88,7 @@ The model’s narration is fictional. The report confirms that generating it lef
 
 ### Render for the shared game, the device for private memories
 
-The frontend and Express API run on Render. The release configuration uses a free web service and free Postgres in Singapore. Reward updates use database transactions, including protection against duplicate simultaneous check-ins. Real sessions survive service restarts once the database is connected.
+The frontend and Express API run on Render. The release configuration uses a free web service and free Postgres in Singapore. Reward updates use database transactions, including protection against duplicate simultaneous check-ins. Explorer state and world rankings are stored in Render Postgres.
 
 GPS check-ins require a recent fix, acceptable accuracy, and proximity to the checkpoint. Previously completed destinations disappear from suggestions for 24 hours. Trail checkpoints must be completed in order.
 
@@ -100,7 +100,8 @@ Render’s free service can take about a minute to wake, and its free Postgres e
 
 - **33 automated tests** cover auth, GPS validation, camera metadata, progression, cooldowns, duplicate rewards, map caching and backoff, and Postgres rollback and cleanup.
 - **19 browser scenarios** cover the quest flows, camera capture, companions, trophies, rankings, session export/restore, journal deletion, and every screen at 390 px width.
-- A separate check returned **18 real mapped landmarks** near a public central London test coordinate.
+- The deployed API returned **18 real mapped landmarks** near a public central London test coordinate and created a grounded quest without claiming an outdoor visit or reward.
+- A private explorer and its active quest survived a service restart with Postgres. The [live deployment report](https://github.com/faraz-shamim/ascend/blob/main/docs/deployment-check.json) records the checks; no test XP was added to public rankings.
 - Gemma’s inference ran for real in the browser; its measured output is linked above.
 
 The browser suite uses **simulated GPS and a synthetic camera feed**. Voice-command actions were tested with a synthesized transcript. Audible local speech and live microphone transcription still need testing on a physical phone. I have not claimed an outdoor field trial, and browser-reported GPS remains spoofable: these rankings support friendly play.

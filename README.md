@@ -67,7 +67,7 @@ The browser QA script currently uses an installed Windows Chrome path. Set `ASCE
 - Genuine local Gemma inference is recorded in [docs/gemma-inference.json](docs/gemma-inference.json). The compact model produced a story in about 5.1 seconds on the test browser's GPU; the first download and generation took about 98.5 seconds. This is one device measurement, not a universal performance guarantee.
 - CPU/WASM inference was also run with WebGPU disabled: about 33.1 seconds to generate, 170.4 seconds including the first download. See [docs/gemma-cpu-inference.json](docs/gemma-cpu-inference.json). Interrupted model downloads recover through verified 8 MiB ranges with bounded retries.
 - Browser speech capability detection, button fallback, and voice-command actions using a synthesized transcript were tested. Playback controls and button fallback were exercised; audible playback and live microphone transcription still require physical-device testing.
-- [docs/browser-qa.json](docs/browser-qa.json), [docs/map-service-check.json](docs/map-service-check.json), and screenshots document the checks.
+- [docs/browser-qa.json](docs/browser-qa.json), [docs/map-service-check.json](docs/map-service-check.json), [docs/deployment-check.json](docs/deployment-check.json), and screenshots document the checks. The deployed API returned 18 mapped destinations; a private explorer and active quest survived a same-version service redeployment with Postgres, without claiming a physical visit or reward.
 
 ## Privacy and limits
 
